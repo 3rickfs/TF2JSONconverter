@@ -1,0 +1,12 @@
+*.swp
+*.pyc
+nod/test/__pycache__/
+*.vim
+*.swn
+*.swn
+*.swm
+./aipu/*.swm
+aipu/.aipu.py.swm/
+*.swo
+*/__pycache__
+/env
