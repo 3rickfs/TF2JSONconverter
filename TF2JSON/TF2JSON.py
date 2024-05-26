@@ -20,30 +20,48 @@ class get_AI_model_components(convertion_ops):
 
     def run_operation(**kwargs):
         W, B, A, N = [], [], [], []
+        tP, tL, tN = 0, 0, 0
         model = kwargs["model"]
 
         for i in range(1, len(model.layers)):
-          weights, biases = model.layers[i].get_weights()
-          W.append(weights)
-          B.append(biases)
-          A.append(str(model.layers[i].activation).split(" ")[1])
+            weights, biases = model.layers[i].get_weights()
+            tP += len(weights)
+            W.append(weights)
+            B.append(biases)
+            A.append(str(model.layers[i].activation).split(" ")[1])
 
         print(f"W: {W}")
         print(f"B: {B}")
         print(f"A: {A}")
 
         for i, ws in enumerate(W):
-          print(ws[0,:])
-          n = []
-          #print(f"len ws: {len(ws)}")
-          #print(f"len wsi: {len(ws[i])}")
-          for j in range(len(ws[0])):
-            n.append(ws[:,j])
-          N.append(n)
+            print(ws[0,:])
+            n = []
+            #print(f"len ws: {len(ws)}")
+            #print(f"len wsi: {len(ws[i])}")
+            for j in range(len(ws[0])):
+                n.append(ws[:,j])
+            tN += len(n)
+            N.append(n)
         print(N)
-        print(f"Numero de capas: {len(N)}") #Numero de capas
+        print(f"Numero de capas: {tN}") #Numero de capas
+        tL = len(N)
 
         kwargs["W"], kwargs["B"], kwargs["A"], kwargs["N"] = W, B, A, N
+        #total Parameters, layers and neurons
+        kwargs["tP"], kwargs["tL"], kwargs["tN"] = tP, tL, tN
+
+        return kwargs
+
+class complete_model_info(convertion_ops):
+    """ add model metainformation
+    """
+
+    def run_operation(**kwargs):
+        print("Completing model information")
+        kwargs["model_info"]["neurons_num"] = kwargs["tN"]
+        kwargs["model_info"]["layers_num"] = kwargs["tL"]
+        kwargs["model_info"]["params_num"] = kwargs["tP"]
 
         return kwargs
 
@@ -79,23 +97,24 @@ class get_JSON_string(convertion_ops):
             ons.append(on)
             if c < 1:
               model_dict["layers"][nm][nnm] = {
-                  "inputs_names": ["x"+str(i) for i in range(1, n_ent+1)],
-                  "outputs_names": [on],
-                  "pesos": {
+                  #"inputs_names": ["x"+str(i) for i in range(1, n_ent+1)],
+                  "i": ["x" + str(1), "x" + str(n_ent)], #input names
+                  "o": [on], #output names
+                  "p": { #weights
                       "w": [float(N[c][n][i]) for i in range(len(N[c][n]))]
                   },
-                  "bias": float(B[c][n]),
-                  "fa": A[c]
+                  "b": float(B[c][n]), #bias
+                  "f": A[c] #activation function
               }
             else:
               model_dict["layers"][nm][nnm] = {
-                  "inputs_names": oss.copy(),
-                  "outputs_names": [on],
-                  "pesos": {
-                      "w": [float(N[c][n][i]) for i in range(len(N[c][n]))]
+                  "i": [oss[0], oss[-1]], #oss.copy(),
+                  "o": [on],
+                  "p": {
+                      "w": [round(float(N[c][n][i]),2) for i in range(len(N[c][n]))]
                   },
-                  "bias": float(B[c][n]),
-                  "fa": A[c]
+                  "b": float(B[c][n]),
+                  "f": A[c]
               }
 
         print(model_dict)
