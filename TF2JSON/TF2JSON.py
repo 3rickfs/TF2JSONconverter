@@ -135,16 +135,21 @@ class JSONobj2File(convertion_ops):
     """
 
     def run_operation(**kwargs):
-        print("JSON obj to file")
-        model_file_name = kwargs["model_file_name"]
-        model_dict = kwargs["model_dict"]
-        with open(model_file_name, "w") as outfile:
-            json.dump(model_dict, outfile)
-        #Display the json string that was saved
-        print("Json file saved")
-        if verbose:
-            json_object = json.dumps(model_dict, indent = 4)
-            print(json_object)
+        try:
+            smj = kwargs["save_model_json"]
+        except:
+            smj = False
+        if smj:
+            print("JSON obj to file")
+            model_file_name = kwargs["model_file_name"]
+            model_dict = kwargs["model_dict"]
+            with open(model_file_name, "w") as outfile:
+                json.dump(model_dict, outfile)
+            #Display the json string that was saved
+            print("Json file saved")
+            if verbose:
+                json_object = json.dumps(model_dict, indent = 4)
+                print(json_object)
 
         return kwargs
 
