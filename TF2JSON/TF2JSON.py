@@ -141,9 +141,10 @@ class JSONobj2File(convertion_ops):
         with open(model_file_name, "w") as outfile:
             json.dump(model_dict, outfile)
         #Display the json string that was saved
-        json_object = json.dumps(model_dict, indent = 4)
         print("Json file saved")
-        if verbose: print(json_object)
+        if verbose:
+            json_object = json.dumps(model_dict, indent = 4)
+            print(json_object)
 
         return kwargs
 
