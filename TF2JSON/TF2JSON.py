@@ -93,6 +93,7 @@ class get_JSON_string(convertion_ops):
         ons = [] #outputs names
         for c in range(len(N)):
           nm = "layer_" + str(c+1)
+          print(f"---- {nm} ----")
           model_dict["layers"][nm] = {}
           oss = ons.copy()
           ons = []
@@ -107,7 +108,7 @@ class get_JSON_string(convertion_ops):
                   "i": ["x" + str(1), "x" + str(n_ent)], #input names
                   "o": [on], #output names
                   "p": { #weights
-                      "w": [float(N[c][n][i]) for i in range(len(N[c][n]))]
+                      "w": [round(float(N[c][n][i]), 1) for i in range(len(N[c][n]))]
                   },
                   "b": float(B[c][n]), #bias
                   "f": A[c] #activation function
@@ -117,7 +118,7 @@ class get_JSON_string(convertion_ops):
                   "i": [oss[0], oss[-1]], #oss.copy(),
                   "o": [on],
                   "p": {
-                      "w": [round(float(N[c][n][i]),2) for i in range(len(N[c][n]))]
+                      "w": [round(float(N[c][n][i]), 1) for i in range(len(N[c][n]))]
                   },
                   "b": float(B[c][n]),
                   "f": A[c]
