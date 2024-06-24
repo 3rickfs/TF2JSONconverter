@@ -4,6 +4,8 @@ import json
 
 import numpy as np
 
+verbose = False
+
 class convertion_ops(ABC):
     """ Abstract class to be inherited from ops childs to convert from
         TF to JSON
@@ -19,6 +21,7 @@ class get_AI_model_components(convertion_ops):
     """
 
     def run_operation(**kwargs):
+        print("Get AI model components from keras file")
         W, B, A, N = [], [], [], []
         tP, tL, tN = 0, 0, 0
         model = kwargs["model"]
@@ -29,13 +32,15 @@ class get_AI_model_components(convertion_ops):
             W.append(weights)
             B.append(biases)
             A.append(str(model.layers[i].activation).split(" ")[1])
+            print(f"Layer {i} loaded")
 
-        print(f"W: {W}")
-        print(f"B: {B}")
-        print(f"A: {A}")
+        if verbose:
+            print(f"W: {W}")
+            print(f"B: {B}")
+            print(f"A: {A}")
 
         for i, ws in enumerate(W):
-            print(ws[0,:])
+            if verbose: print(ws[0,:])
             n = []
             #print(f"len ws: {len(ws)}")
             #print(f"len wsi: {len(ws[i])}")
@@ -43,7 +48,7 @@ class get_AI_model_components(convertion_ops):
                 n.append(ws[:,j])
             tN += len(n)
             N.append(n)
-        print(N)
+        if verbose: print(N)
         print(f"Numero de capas: {tN}") #Numero de capas
         tL = len(N)
 
@@ -70,6 +75,7 @@ class get_JSON_string(convertion_ops):
     """
 
     def run_operation(**kwargs):
+        print("Getting JSON String")
 
         W, B, A, N = kwargs["W"], kwargs["B"], kwargs["A"], kwargs["N"]
 
@@ -117,7 +123,7 @@ class get_JSON_string(convertion_ops):
                   "f": A[c]
               }
 
-        print(model_dict)
+        if verbose: print(model_dict)
         kwargs["model_dict"] = model_dict
 
         return kwargs
@@ -128,14 +134,15 @@ class JSONobj2File(convertion_ops):
     """
 
     def run_operation(**kwargs):
+        print("JSON obj to file")
         model_file_name = kwargs["model_file_name"]
         model_dict = kwargs["model_dict"]
         with open(model_file_name, "w") as outfile:
             json.dump(model_dict, outfile)
         #Display the json string that was saved
         json_object = json.dumps(model_dict, indent = 4)
-        print("Json file saved:")
-        print(json_object)
+        print("Json file saved")
+        if verbose: print(json_object)
 
         return kwargs
 
